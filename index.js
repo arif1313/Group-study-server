@@ -1,7 +1,7 @@
 const express =require('express');
 const cors = require('cors');
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('mongodb');
 require('dotenv').config()
 const app =express();
@@ -45,49 +45,18 @@ async function run() {
         console.log(err)
        }
     })
+    app.get('/assignments/:id',async(req,res)=>{
 
-    app.get('/assignments/:id', async (req, res) => {
+      try{
         const id = req.params.id;
-        const query = { _id: new ObjectId(id) }
-        try{
-          
-
-        // const options = {
-        //     // Include only the `title` and `imdb` fields in the returned document
-        //     projection: { title: 1, price: 1, service_id: 1, img: 1 },
-        // };
-
-        const result = await AssignmentCollection.findOne(query);
-        res.send(result);
-        }
-        catch(err){
-            console.log(err)
-        }
+      const query ={_id: new ObjectId(id)} 
+      const result =await AssignmentCollection.findOne(query);
+      res.send(result)
+      }catch(err){
+        console.log(err);
+      }
+      
     })
-
-
-    // bookings 
-    app.get('/bookings', async (req, res) => {
-        console.log(req.query.email);
-        let query = {};
-        if (req.query?.email) {
-            query = { email: req.query.email }
-        }
-        const result = await AssignmentCollection.find(query).toArray();
-        res.send(result);
-    })
-
-    app.post('/createAssignment', async (req, res) => {
-        const assignment = req.body;
-        console.log(assignment);
-        const result = await AssignmentCollection.insertOne(assignment);
-        res.send(result);
-    });
-
-    
-
-
-
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -105,24 +74,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(` Server is running on port ${port}`)
 })
-
-// app.patch('/bookings/:id', async (req, res) => {
-    //     const id = req.params.id;
-    //     const filter = { _id: new ObjectId(id) };
-    //     const updatedBooking = req.body;
-    //     console.log(updatedBooking);
-    //     const updateDoc = {
-    //         $set: {
-    //             status: updatedBooking.status
-    //         },
-    //     };
-    //     const result = await AssignmentCollection.updateOne(filter, updateDoc);
-    //     res.send(result);
-    // })
-
-    // app.delete('/bookings/:id', async (req, res) => {
-    //     const id = req.params.id;
-    //     const query = { _id: new ObjectId(id) }
-    //     const result = await AssignmentCollection.deleteOne(query);
-    //     res.send(result);
-    // })
