@@ -77,16 +77,16 @@ async function run() {
        console.log(err)
       }
    })
-   app.get('/submition', async (req, res) => {
+//    app.get('/submition', async (req, res) => {
       
-    try{
-     const Assignments = await TakenAssignmentCollection.find().toArray();
-     res.send(Assignments);
-    }
-    catch(err){
-     console.log(err)
-    }
- })
+//     try{
+//      const Assignments = await submitionsCollection.find().toArray();
+//      res.send(Assignments);
+//     }
+//     catch(err){
+//      console.log(err)
+//     }
+//  })
    app.get('/takenAssignment/:id',async(req,res)=>{
 
     try{
@@ -126,6 +126,20 @@ async function run() {
       console.log(assignment);
       const result = await submitionsCollection.insertOne(assignment);
       res.send(result);
+  });
+  app.get("/submition", async (req, res) => {
+    try {
+      const query = { ownerEmail: req.query?.email };
+
+      if (req.query?.email) {
+        const taken = await submitionsCollection.find(query).toArray();
+        res.send(taken);
+      } else {
+        res.send([]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   });
     app.get('/assignments', async (req, res) => {
           console.log(req.query.email);
