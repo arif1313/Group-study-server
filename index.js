@@ -34,6 +34,8 @@ async function run() {
     // Send a ping to confirm a successful connection
     // const serviceCollection = client.db('carDoctor').collection('services');
     const AssignmentCollection = client.db('GroupStudy').collection('createdAssignment');
+    const TakenAssignmentCollection = client.db('GroupStudy').collection('takenAssignment');
+    const submitionsCollection = client.db('GroupStudy').collection('submitions');
 
     app.get('/assignments', async (req, res) => {
       
@@ -57,6 +59,61 @@ async function run() {
       }
       
     })
+   
+    app.post('/takenAssignment', async (req, res) => {
+      const body = req.body;
+      console.log(body);
+      //   res.send({ res: body });
+      const result = await TakenAssignmentCollection.insertOne(body);
+      res.send(result);
+    });
+    app.get('/takenAssignment', async (req, res) => {
+      
+      try{
+       const Assignments = await TakenAssignmentCollection.find().toArray();
+       res.send(Assignments);
+      }
+      catch(err){
+       console.log(err)
+      }
+   })
+   app.get('/submition', async (req, res) => {
+      
+    try{
+     const Assignments = await TakenAssignmentCollection.find().toArray();
+     res.send(Assignments);
+    }
+    catch(err){
+     console.log(err)
+    }
+ })
+   app.get('/takenAssignment/:id',async(req,res)=>{
+
+    try{
+      const id = req.params.id;
+    const query ={_id: new ObjectId(id)} 
+    const result =await TakenAssignmentCollection.findOne(query);
+    res.send(result)
+    }catch(err){
+      console.log(err);
+    }
+    
+  })
+    app.get("/mytakenAssignment", async (req, res) => {
+      try {
+        const query = { gotUserEmail: req.query?.email };
+
+        if (req.query?.email) {
+          const taken = await TakenAssignmentCollection.find(query).toArray();
+          res.send(taken);
+        } else {
+          res.send([]);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
 
     app.post('/assignments', async (req, res) => {
         const assignment = req.body;
@@ -64,6 +121,12 @@ async function run() {
         const result = await AssignmentCollection.insertOne(assignment);
         res.send(result);
     });
+    app.post('/submition', async (req, res) => {
+      const assignment = req.body;
+      console.log(assignment);
+      const result = await submitionsCollection.insertOne(assignment);
+      res.send(result);
+  });
     app.get('/assignments', async (req, res) => {
           console.log(req.query.email);
           let query = {};
@@ -80,6 +143,24 @@ async function run() {
         const result = await AssignmentCollection.deleteOne(query)
         res.send(result)
       })
+      app.patch('/mytakenAssignment/:id',async(req,res)=>{
+        const id = req.params.id;
+        const filter ={_id: new ObjectId(id)};
+        const updattakeAssignment = req.body;
+        console.log(updattakeAssignment);
+        const updateDoc = {
+          $set: {
+            Status:updattakeAssignment.Status
+          },
+
+        };
+        
+        const result = await TakenAssignmentCollection.updateOne(filter,updateDoc);
+        res.send(result);
+
+         
+      })
+
 
       app.put('/assignments/:id',async(req,res)=>{
         const id = req.params.id;
@@ -92,6 +173,7 @@ async function run() {
           },
 
         };
+        
         const result = await AssignmentCollection.updateOne(query,updateDoc);
         res.send(result);
 
