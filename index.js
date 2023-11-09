@@ -141,6 +141,35 @@ async function run() {
       console.log(err);
     }
   });
+  app.get('/submition/:id',async(req,res)=>{
+
+    try{
+      const id = req.params.id;
+    const query ={_id: new ObjectId(id)} 
+    const result =await submitionsCollection.findOne(query);
+    res.send(result)
+    }catch(err){
+      console.log(err);
+    }
+    
+  })
+  app.put('/submition/:id',async(req,res)=>{
+    const id = req.params.id;
+    const query ={_id: new ObjectId(id)};
+    const updatAssignment = req.body;
+    console.log(updatAssignment);
+    const updateDoc = {
+      $set: {
+       ...updatAssignment
+      },
+
+    };
+    
+    const result = await submitionsCollection.updateOne(query,updateDoc);
+    res.send(result);
+
+     
+  })
     app.get('/assignments', async (req, res) => {
           console.log(req.query.email);
           let query = {};
