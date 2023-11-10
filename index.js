@@ -1,7 +1,7 @@
 const express =require('express');
 const cors = require('cors');
-const  jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
+// const  jwt = require('jsonwebtoken');
+// const cookieParser = require('cookie-parser');
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('mongodb');
@@ -14,12 +14,14 @@ console.log(process.env.DATA_USER)
 console.log(process.env.DATA_PASS)
 
 // middleware
-app.use(cors({
-  origin:['http://localhost:5173'],
-  credentials:true
-}));
+app.use(cors());
+//   {
+//   origin:['http://localhost:5173'],
+//   credentials:true
+// }
+
 app.use(express.json());
-app.use(cookieParser());
+// app.use(cookieParser());
 
 
 const uri = `mongodb+srv://${process.env.DATA_USER}:${process.env.DATA_PASS}@cluster0.pcuge1b.mongodb.net/?retryWrites=true&w=majority`;
@@ -34,31 +36,31 @@ const client = new MongoClient(uri, {
 });
 
 // create middelwar
-const logger = async(req, res, next)=>{
-  console.log('called :', req.host, req.originalUrl)
-  next();
-}
+// const logger = async(req, res, next)=>{
+//   console.log('called :', req.host, req.originalUrl)
+//   next();
+// }
 
-const verifyToken = async(req, res, next)=>{
-  const token = req.cookies?.token;
-  console.log('value of token in meddele ware',token)
-  if(!token){
-    return res.status(401).send({message: 'forbidden'})
-  }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
- // error
-    if(err){
-      console.log(err)
-      return res.status(401).send({message: 'forbidden'})
-    }
-    console.log('value in the token ', decoded)
-    req.user =decoded;
+// const verifyToken = async(req, res, next)=>{
+//   const token = req.cookies?.token;
+//   console.log('value of token in meddele ware',token)
+//   if(!token){
+//     return res.status(401).send({message: 'forbidden'})
+//   }
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+//  // error
+//     if(err){
+//       console.log(err)
+//       return res.status(401).send({message: 'forbidden'})
+//     }
+//     console.log('value in the token ', decoded)
+//     req.user =decoded;
 
 
-    next();
-  })
+//     next();
+//   })
  
-}
+// }
 
 
 async function run() {
@@ -72,26 +74,26 @@ async function run() {
     const submitionsCollection = client.db('GroupStudy').collection('submitions');
 
 
-    app.post('/jwt',logger, async(req, res)=>{
-      const user = req.body;
-      console.log(user)
-      const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn:'1h'
-      })
-      res
-      .cookie('token', token, {
-        httpOnly:true,
-        secure:false,
+    // app.post('/jwt', async(req, res)=>{
+    //   const user = req.body;
+    //   console.log(user)
+    //   const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET, {
+    //     expiresIn:'1h'
+    //   })
+    //   res
+    //   .cookie('token', token, {
+    //     httpOnly:true,
+    //     secure:false,
         
-      })
-      .send({success: true});
+    //   })
+    //   .send({success: true});
 
-    })
+    // })
 // 
-    app.get('/assignments',logger, async (req, res) => {
+    app.get('/assignments', async (req, res) => {
       
        try{
-        console.log('token are',req.cookies.token)
+        // console.log('token are',req.cookies.token)
         const Assignments = await AssignmentCollection.find().toArray();
         res.send(Assignments);
        }
@@ -99,7 +101,7 @@ async function run() {
         console.log(err)
        }
     })
-    app.get('/assignments/:id',logger, verifyToken, async(req,res)=>{
+    app.get('/assignments/:id',  async(req,res)=>{
 
       try{
         const id = req.params.id;
@@ -112,14 +114,14 @@ async function run() {
       
     })
    
-    app.post('/takenAssignment',logger,verifyToken, async (req, res) => {
+    app.post('/takenAssignment', async (req, res) => {
       const body = req.body;
       console.log(body);
       //   res.send({ res: body });
       const result = await TakenAssignmentCollection.insertOne(body);
       res.send(result);
     });
-    app.get('/takenAssignment',logger,verifyToken, async (req, res) => {
+    app.get('/takenAssignment', async (req, res) => {
       
       try{
        const Assignments = await TakenAssignmentCollection.find().toArray();
@@ -139,7 +141,7 @@ async function run() {
 //      console.log(err)
 //     }
 //  })
-   app.get('/takenAssignment/:id',logger, verifyToken ,async(req,res)=>{
+   app.get('/takenAssignment/:id', async(req,res)=>{
 
     try{
       const id = req.params.id;
@@ -151,7 +153,7 @@ async function run() {
     }
     
   })
-    app.get("/mytakenAssignment",logger,verifyToken, async (req, res) => {
+    app.get("/mytakenAssignment", async (req, res) => {
       try {
         const query = { gotUserEmail: req.query?.email };
 
@@ -167,24 +169,21 @@ async function run() {
     });
 
 
-    app.post('/assignments',logger, async (req, res) => {
+    app.post('/assignments', async (req, res) => {
         const assignment = req.body;
         console.log(assignment);
         const result = await AssignmentCollection.insertOne(assignment);
         res.send(result);
     });
-    app.post('/submition',logger, async (req, res) => {
+    app.post('/submition', async (req, res) => {
       const assignment = req.body;
       console.log(assignment);
       const result = await submitionsCollection.insertOne(assignment);
       res.send(result);
   });
-  app.get("/submition",logger,verifyToken, async (req, res) => {
-    console.log('valid user', req.user.email)
-    if(req.query.email !== req.user.email)
-    return res.status(403).send({message: 'fobeden89'})
+ 
+  app.get("/submition", async (req, res) => {
     try {
-    
       const query = { ownerEmail: req.query?.email };
 
       if (req.query?.email) {
@@ -197,7 +196,8 @@ async function run() {
       console.log(err);
     }
   });
-  app.get('/submition/:id',logger,verifyToken, async(req,res)=>{
+
+  app.get('/submition/:id', async(req,res)=>{
 
     try{
       const id = req.params.id;
@@ -209,7 +209,35 @@ async function run() {
     }
     
   })
-  app.put('/submition/:id',logger, async(req,res)=>{
+  app.get("/marksubmition", async (req, res) => {
+    try {
+      const query = { submiedMail: req.query?.email };
+
+      if (req.query?.email) {
+        const taken = await submitionsCollection.find(query).toArray();
+        res.send(taken);
+      } else {
+        res.send([]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  // app.get('/marksubmition/:id', async(req,res)=>{
+
+  //   try{
+  //     const id = req.params.id;
+  //   const query ={submitionAssId: id} 
+  //   const result =await submitionsCollection.findOne(query);
+  //   res.send(result)
+  //   }catch(err){
+  //     console.log(err);
+  //   }
+    
+  // })
+
+
+  app.put('/submition/:id', async(req,res)=>{
     const id = req.params.id;
     const query ={_id: new ObjectId(id)};
     const updatAssignment = req.body;
@@ -226,7 +254,7 @@ async function run() {
 
      
   })
-    app.get('/assignments',logger, verifyToken, async (req, res) => {
+    app.get('/assignments',  async (req, res) => {
           console.log(req.query.email);
           let query = {};
           if (req.query?.email) {
@@ -236,13 +264,13 @@ async function run() {
           res.send(result);
       })
 
-      app.delete('/assignments/:id',logger, async(req,res)=>{
+      app.delete('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)}
         const result = await AssignmentCollection.deleteOne(query)
         res.send(result)
       })
-      app.patch('/mytakenAssignment/:id', logger, async(req,res)=>{
+      app.patch('/mytakenAssignment/:id',  async(req,res)=>{
         const id = req.params.id;
         const filter ={_id: new ObjectId(id)};
         const updattakeAssignment = req.body;
@@ -261,7 +289,7 @@ async function run() {
       })
 
 
-      app.put('/assignments/:id',logger, async(req,res)=>{
+      app.put('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)};
         const updatAssignment = req.body;
@@ -278,6 +306,20 @@ async function run() {
 
          
       })
+
+
+      app.post('/taken-click', async (req, res) => {
+        try {
+          // Perform your MongoDB update here
+          await User.updateOne({ _id: req.user.id }, { isAssignmentSubmitted: true });
+      
+          // Respond with success
+          res.json({ success: true });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      });
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
