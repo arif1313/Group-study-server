@@ -36,10 +36,10 @@ const client = new MongoClient(uri, {
 });
 
 // create middelwar
-// const logger = async(req, res, next)=>{
-//   console.log('called :', req.host, req.originalUrl)
-//   next();
-// }
+const logger = (req, res, next) =>{
+  console.log('log: info', req.method, req.url);
+  next();
+}
 
 // const verifyToken = async(req, res, next)=>{
 //   const token = req.cookies?.token;
@@ -189,7 +189,7 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
     
   })
   // get taken assignment by query email gotUserEmail
-    app.get("/mytakenAssignment", async (req, res) => {
+    app.get("/mytakenAssignment",logger, async (req, res) => {
       console.log('coook', req.cookies)
       try {
         const query = { gotUserEmail: req.query?.email };
