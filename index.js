@@ -70,6 +70,7 @@ async function run() {
     // Send a ping to confirm a successful connection
     // const serviceCollection = client.db('carDoctor').collection('services');
     const AssignmentCollection = client.db('GroupStudy').collection('createdAssignment');
+    const featureCollection = client.db('GroupStudy').collection('features');
     const TakenAssignmentCollection = client.db('GroupStudy').collection('takenAssignment');
     const submitionsCollection = client.db('GroupStudy').collection('submitions');
 
@@ -90,6 +91,7 @@ async function run() {
 
     // })
 // 
+// get all assignment
     app.get('/assignments', async (req, res) => {
       
        try{
@@ -101,6 +103,18 @@ async function run() {
         console.log(err)
        }
     })
+    app.get('/features', async (req, res) => {
+      
+      try{
+       // console.log('token are',req.cookies.token)
+       const Assignments = await featureCollection.find().toArray();
+       res.send(Assignments);
+      }
+      catch(err){
+       console.log(err)
+      }
+   })
+    // get assignment by id
     app.get('/assignments/:id',  async(req,res)=>{
 
       try{
@@ -113,7 +127,20 @@ async function run() {
       }
       
     })
-   
+// get assignment by deficulty 
+app.get('/findassignments/:defiqulty',  async(req,res)=>{
+
+  try{
+    const Defiqulty = req.params.defiqulty;
+  const query ={Difficulty: Defiqulty} 
+  const result =await AssignmentCollection.find(query);
+  res.send(result)
+  }catch(err){
+    console.log(err);
+  }
+  
+})
+  //  post a assignmnet insert Taken a da in  TakenAssignmentCollection
     app.post('/takenAssignment', async (req, res) => {
       const body = req.body;
       console.log(body);
@@ -121,6 +148,7 @@ async function run() {
       const result = await TakenAssignmentCollection.insertOne(body);
       res.send(result);
     });
+    // get all taken assignment
     app.get('/takenAssignment', async (req, res) => {
       
       try{
@@ -141,6 +169,8 @@ async function run() {
 //      console.log(err)
 //     }
 //  })
+
+// get taken assignment by id
    app.get('/takenAssignment/:id', async(req,res)=>{
 
     try{
@@ -153,6 +183,7 @@ async function run() {
     }
     
   })
+  // get taken assignment by query email gotUserEmail
     app.get("/mytakenAssignment", async (req, res) => {
       try {
         const query = { gotUserEmail: req.query?.email };
@@ -168,13 +199,14 @@ async function run() {
       }
     });
 
-
+// create a assignment  
     app.post('/assignments', async (req, res) => {
         const assignment = req.body;
         console.log(assignment);
         const result = await AssignmentCollection.insertOne(assignment);
         res.send(result);
     });
+    // add a submittion in submitionsCollection
     app.post('/submition', async (req, res) => {
       const assignment = req.body;
       console.log(assignment);
@@ -182,6 +214,7 @@ async function run() {
       res.send(result);
   });
  
+      // get  a submittion in submitionsCollection  by email in qury 
   app.get("/submition", async (req, res) => {
     try {
       const query = { ownerEmail: req.query?.email };
@@ -196,7 +229,7 @@ async function run() {
       console.log(err);
     }
   });
-
+// get submition by id parama 
   app.get('/submition/:id', async(req,res)=>{
 
     try{
@@ -209,6 +242,7 @@ async function run() {
     }
     
   })
+  // get submit assignment by submiedMail
   app.get("/marksubmition", async (req, res) => {
     try {
       const query = { submiedMail: req.query?.email };
@@ -236,6 +270,7 @@ async function run() {
     
   // })
 
+// update a submition by id 
 
   app.put('/submition/:id', async(req,res)=>{
     const id = req.params.id;
@@ -254,6 +289,9 @@ async function run() {
 
      
   })
+
+  
+// update a submition by query email
     app.get('/assignments',  async (req, res) => {
           console.log(req.query.email);
           let query = {};
@@ -263,13 +301,15 @@ async function run() {
           const result = await AssignmentCollection.find(query).toArray();
           res.send(result);
       })
-
+// delet assignment 
       app.delete('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)}
         const result = await AssignmentCollection.deleteOne(query)
         res.send(result)
       })
+      // update taken assignmet statuse
+
       app.patch('/mytakenAssignment/:id',  async(req,res)=>{
         const id = req.params.id;
         const filter ={_id: new ObjectId(id)};
@@ -288,7 +328,7 @@ async function run() {
          
       })
 
-
+      // update a assignmetn 
       app.put('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)};
@@ -307,19 +347,7 @@ async function run() {
          
       })
 
-
-      app.post('/taken-click', async (req, res) => {
-        try {
-          // Perform your MongoDB update here
-          await User.updateOne({ _id: req.user.id }, { isAssignmentSubmitted: true });
-      
-          // Respond with success
-          res.json({ success: true });
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: 'Internal Server Error' });
-        }
-      });
+  
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
