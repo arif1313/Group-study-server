@@ -1,7 +1,7 @@
 const express =require('express');
 const cors = require('cors');
 const  jwt = require('jsonwebtoken');
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('mongodb');
@@ -21,7 +21,7 @@ app.use(cors({
   
 
 app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
 
 
 const uri = `mongodb+srv://${process.env.DATA_USER}:${process.env.DATA_PASS}@cluster0.pcuge1b.mongodb.net/?retryWrites=true&w=majority`;
@@ -190,6 +190,7 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
   })
   // get taken assignment by query email gotUserEmail
     app.get("/mytakenAssignment", async (req, res) => {
+      console.log('coook', req.cookies)
       try {
         const query = { gotUserEmail: req.query?.email };
 
