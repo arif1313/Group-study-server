@@ -1,6 +1,6 @@
 const express =require('express');
 const cors = require('cors');
-// const  jwt = require('jsonwebtoken');
+const  jwt = require('jsonwebtoken');
 // const cookieParser = require('cookie-parser');
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -14,11 +14,11 @@ console.log(process.env.DATA_USER)
 console.log(process.env.DATA_PASS)
 
 // middleware
-app.use(cors());
-//   {
-//   origin:['http://localhost:5173'],
-//   credentials:true
-// }
+app.use(cors({
+  origin:['http://localhost:5174'],
+  credentials:true
+}));
+  
 
 app.use(express.json());
 // app.use(cookieParser());
@@ -75,21 +75,26 @@ async function run() {
     const submitionsCollection = client.db('GroupStudy').collection('submitions');
 
 
-    // app.post('/jwt', async(req, res)=>{
-    //   const user = req.body;
-    //   console.log(user)
-    //   const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET, {
-    //     expiresIn:'1h'
-    //   })
-    //   res
-    //   .cookie('token', token, {
-    //     httpOnly:true,
-    //     secure:false,
-        
-    //   })
-    //   .send({success: true});
+    app.post('/jwt', async(req, res)=>{
+      const user = req.body;
+      console.log(user)
+      const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn:'1h'
+      })
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    })
+        .send({ success: true });
+     
+    })
+    app.post('/logout', async (req, res) => {
+      const user = req.body;
+      console.log('logging out', user);
+      res.clearCookie('token', { maxAge: 0 }).send({ success: true })
+  })
 
-    // })
 // 
 // get all assignment
     app.get('/assignments', async (req, res) => {
