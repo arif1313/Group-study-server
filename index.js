@@ -41,27 +41,21 @@ const logger = (req, res, next) =>{
   next();
 }
 
-// const verifyToken = async(req, res, next)=>{
-//   const token = req.cookies?.token;
-//   console.log('value of token in meddele ware',token)
-//   if(!token){
-//     return res.status(401).send({message: 'forbidden'})
-//   }
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
-//  // error
-//     if(err){
-//       console.log(err)
-//       return res.status(401).send({message: 'forbidden'})
-//     }
-//     console.log('value in the token ', decoded)
-//     req.user =decoded;
-
-
-//     next();
-//   })
- 
-// }
-
+const verifyToken = (req, res, next) =>{
+  const token = req?.cookies?.token;
+  // console.log('token in the middleware', token);
+  // no token available 
+  if(!token){
+      return res.status(401).send({message: 'unauthorized access'})
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+      if(err){
+          return res.status(401).send({message: 'unauthorized access'})
+      }
+      req.user = decoded;
+      next();
+  })
+}
 
 async function run() {
   try {
@@ -189,11 +183,10 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
     
   })
   // get taken assignment by query email gotUserEmail
-    app.get("/mytakenAssignment",logger, async (req, res) => {
-      console.log('coook', req.cookies)
+    app.get("/mytakenAssignment",logger,verifyToken, async (req, res) => {
+      console.log('token owner info', req.user)
       try {
         const query = { gotUserEmail: req.query?.email };
-
         if (req.query?.email) {
           const taken = await TakenAssignmentCollection.find(query).toArray();
           res.send(taken);
