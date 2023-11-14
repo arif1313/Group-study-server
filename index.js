@@ -47,8 +47,7 @@ const logger = (req, res, next) =>{
 
 const verifyToken = (req, res, next) =>{
   const token = req?.cookies?.token;
-  // console.log('token in the middleware', token);
-  // no token available 
+  
   if(!token){
       return res.status(401).send({message: 'unauthorized access'})
   }
@@ -162,17 +161,6 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
        console.log(err)
       }
    })
-//    app.get('/submition', async (req, res) => {
-      
-//     try{
-//      const Assignments = await submitionsCollection.find().toArray();
-//      res.send(Assignments);
-//     }
-//     catch(err){
-//      console.log(err)
-//     }
-//  })
-
 // get taken assignment by id
    app.get('/takenAssignment/:id', async(req,res)=>{
 
@@ -265,19 +253,6 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
       console.log(err);
     }
   });
-  // app.get('/marksubmition/:id', async(req,res)=>{
-
-  //   try{
-  //     const id = req.params.id;
-  //   const query ={submitionAssId: id} 
-  //   const result =await submitionsCollection.findOne(query);
-  //   res.send(result)
-  //   }catch(err){
-  //     console.log(err);
-  //   }
-    
-  // })
-
 // update a submition by id 
 
   app.put('/submition/:id', async(req,res)=>{
