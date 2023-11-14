@@ -15,7 +15,11 @@ console.log(process.env.DATA_PASS)
 
 // middleware
 app.use(cors({
-  origin:['http://localhost:5174'],
+  origin:[
+  
+   'https://group-study-b0ce6.web.app' ,
+   'https://group-study-b0ce6.firebaseapp.com'
+  ],
   credentials:true
 }));
   
