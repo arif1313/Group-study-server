@@ -92,6 +92,28 @@ async function run() {
   })
 
 // 
+
+
+// get taken assignment by query email gotUserEmail
+app.get("/mytakenAssignment",logger,verifyToken, async (req, res) => {
+  console.log('token owner info', req.user)
+ 
+  try {
+    if(req.user.email !== req.query.email){
+      return res.status(403).send({message: 'forbidden access'})
+    }
+    const query = { gotUserEmail: req.query?.email };
+ 
+    if (req.query?.email) {
+      const taken = await TakenAssignmentCollection.find(query).toArray();
+      res.send(taken);
+    } else {
+      res.send([]);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 // get all assignment
     app.get('/assignments', async (req, res) => {
       
@@ -173,26 +195,7 @@ app.get('/findassignments/:defiqulty',  async(req,res)=>{
     }
     
   })
-  // get taken assignment by query email gotUserEmail
-    app.get("/mytakenAssignment",logger,verifyToken, async (req, res) => {
-      console.log('token owner info', req.user)
-     
-      try {
-        if(req.user.email !== req.query.email){
-          return res.status(403).send({message: 'forbidden access'})
-        }
-        const query = { gotUserEmail: req.query?.email };
-     
-        if (req.query?.email) {
-          const taken = await TakenAssignmentCollection.find(query).toArray();
-          res.send(taken);
-        } else {
-          res.send([]);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    });
+  
 
 // create a assignment  
     app.post('/assignments', async (req, res) => {
