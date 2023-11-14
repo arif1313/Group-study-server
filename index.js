@@ -72,7 +72,7 @@ async function run() {
     const submitionsCollection = client.db('GroupStudy').collection('submitions');
 
 
-    app.post('/jwt',logger, async(req, res)=>{
+    app.post('/jwt', async(req, res)=>{
       const user = req.body;
       console.log(user)
       const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET, {
@@ -86,7 +86,7 @@ async function run() {
         .send({ success: true });
      
     })
-    app.post('/logout',logger, async (req, res) => {
+    app.post('/logout', async (req, res) => {
       const user = req.body;
       console.log('logging out', user);
       res.clearCookie('token', { maxAge: 0 }).send({ success: true })
@@ -94,7 +94,7 @@ async function run() {
 
 // 
 // get all assignment
-    app.get('/assignments',logger, async (req, res) => {
+    app.get('/assignments', async (req, res) => {
       
        try{
         // console.log('token are',req.cookies.token)
@@ -105,7 +105,7 @@ async function run() {
         console.log(err)
        }
     })
-    app.get('/features',logger, async (req, res) => {
+    app.get('/features', async (req, res) => {
       
       try{
        // console.log('token are',req.cookies.token)
@@ -117,7 +117,7 @@ async function run() {
       }
    })
     // get assignment by id
-    app.get('/assignments/:id',logger,  async(req,res)=>{
+    app.get('/assignments/:id',  async(req,res)=>{
 
       try{
         const id = req.params.id;
@@ -130,7 +130,7 @@ async function run() {
       
     })
 // get assignment by deficulty 
-app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
+app.get('/findassignments/:defiqulty',  async(req,res)=>{
 
   try{
     const Defiqulty = req.params.defiqulty;
@@ -143,7 +143,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
   
 })
   //  post a assignmnet insert Taken a da in  TakenAssignmentCollection
-    app.post('/takenAssignment',logger, async (req, res) => {
+    app.post('/takenAssignment', async (req, res) => {
       const body = req.body;
       console.log(body);
       //   res.send({ res: body });
@@ -151,7 +151,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
       res.send(result);
     });
     // get all taken assignment
-    app.get('/takenAssignment',logger, async (req, res) => {
+    app.get('/takenAssignment', async (req, res) => {
       
       try{
        const Assignments = await TakenAssignmentCollection.find().toArray();
@@ -162,7 +162,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
       }
    })
 // get taken assignment by id
-   app.get('/takenAssignment/:id',logger, async(req,res)=>{
+   app.get('/takenAssignment/:id', async(req,res)=>{
 
     try{
       const id = req.params.id;
@@ -196,14 +196,14 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
     });
 
 // create a assignment  
-    app.post('/assignments',logger, async (req, res) => {
+    app.post('/assignments', async (req, res) => {
         const assignment = req.body;
         console.log(assignment);
         const result = await AssignmentCollection.insertOne(assignment);
         res.send(result);
     });
     // add a submittion in submitionsCollection
-    app.post('/submition',logger, async (req, res) => {
+    app.post('/submition', async (req, res) => {
       const assignment = req.body;
       console.log(assignment);
       const result = await submitionsCollection.insertOne(assignment);
@@ -211,7 +211,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
   });
  
       // get  a submittion in submitionsCollection  by email in qury 
-  app.get("/submition",logger, async (req, res) => {
+  app.get("/submition", async (req, res) => {
     try {
       const query = { ownerEmail: req.query?.email };
 
@@ -226,7 +226,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
     }
   });
 // get submition by id parama 
-  app.get('/submition/:id',logger, async(req,res)=>{
+  app.get('/submition/:id', async(req,res)=>{
 
     try{
       const id = req.params.id;
@@ -239,7 +239,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
     
   })
   // get submit assignment by submiedMail
-  app.get("/marksubmition",logger, async (req, res) => {
+  app.get("/marksubmition", async (req, res) => {
     try {
       const query = { submiedMail: req.query?.email };
 
@@ -255,7 +255,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
   });
 // update a submition by id 
 
-  app.put('/submition/:id',logger, async(req,res)=>{
+  app.put('/submition/:id', async(req,res)=>{
     const id = req.params.id;
     const query ={_id: new ObjectId(id)};
     const updatAssignment = req.body;
@@ -275,7 +275,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
 
   
 // update a submition by query email
-    app.get('/assignments',logger,  async (req, res) => {
+    app.get('/assignments',  async (req, res) => {
           console.log(req.query.email);
           let query = {};
           if (req.query?.email) {
@@ -285,7 +285,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
           res.send(result);
       })
 // delet assignment 
-      app.delete('/assignments/:id',logger, async(req,res)=>{
+      app.delete('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)}
         const result = await AssignmentCollection.deleteOne(query)
@@ -293,7 +293,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
       })
       // update taken assignmet statuse
 
-      app.patch('/mytakenAssignment/:id',logger,  async(req,res)=>{
+      app.patch('/mytakenAssignment/:id',  async(req,res)=>{
         const id = req.params.id;
         const filter ={_id: new ObjectId(id)};
         const updattakeAssignment = req.body;
@@ -312,7 +312,7 @@ app.get('/findassignments/:defiqulty',logger,  async(req,res)=>{
       })
 
       // update a assignmetn 
-      app.put('/assignments/:id',logger, async(req,res)=>{
+      app.put('/assignments/:id', async(req,res)=>{
         const id = req.params.id;
         const query ={_id: new ObjectId(id)};
         const updatAssignment = req.body;
